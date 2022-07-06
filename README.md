@@ -6,9 +6,17 @@ s3にコンテンツも流し込む。
 
 # deploy
 
+AWSアカウントは
+環境変数で設定するか、
+それともdefaultプロファイルをそのまま使うか
+してください。
+
+[provider "aws" の profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#profile)
+などを書いてもいいです。
+
 ```bash
 cp terraform.tfvars- terraform.tfvars
-vim terraform.tfvars
+vim terraform.tfvars  # お好みに合わせて修正
 terraform init
 terraform apply
 ```
