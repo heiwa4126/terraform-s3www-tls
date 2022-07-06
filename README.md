@@ -5,7 +5,7 @@ aws_acm_certificate を使って https の独自ドメインで公開するサ�
 
 # 前提
 
-Route 53でホストゾーンを登録していること
+Route 53でホストゾーンを登録していること。
 
 
 # deploy
@@ -24,16 +24,17 @@ vim terraform.tfvars  # お好みに合わせて修正
 terraform init
 terraform apply
 ```
+かなり時間がかかります(5分ぐらい)。
+
 
 テストは
 ```bash
 ./curl-test.sh
 ```
-またはoutputのs3wwwurlのURLにブラウザでアクセス
+またはoutputのs3wwwurl_tsl のURLにブラウザでアクセス
 
 
 # メモ
 
-[Using Terraform for S3 Storage with MIME Type Association | State Farm Engineering](https://engineering.statefarm.com/blog/terraform-s3-upload-with-mime/) にしたがって
-ディレクトリまるごとfor_eachとmimeでs3にあげるようにした。
-`terraform state list` でどんな感じかわかると思う。
+「certificateだけus-east-1」というAWSの仕様にもかかわらず
+1回でデプロイできるTerraformはえらい。
