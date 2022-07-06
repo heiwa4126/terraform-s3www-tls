@@ -121,7 +121,7 @@ tmp*
 *.tmp
 account*
 *.zip
-contents/*
+# contents/*
 variable*.tf
 src/*
 tmp/*
