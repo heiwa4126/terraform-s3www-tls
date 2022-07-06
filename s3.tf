@@ -35,11 +35,7 @@ resource "aws_s3_object" "logo" {
   acl          = "public-read"
 }
 
-output "s3url" {
+output "s3wwwurl" {
   description = "URL of S3 bucket to hold website content"
-  value       = "http://${aws_s3_bucket.www.bucket_regional_domain_name}/"
-}
-output "s3url2" {
-  description = "URL of S3 bucket to hold website content"
-  value       = "http://${aws_s3_bucket.www.bucket_domain_name}/"
+  value       = "http://${aws_s3_bucket.www.website_endpoint}/"
 }
