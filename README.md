@@ -30,9 +30,6 @@ terraform apply
 
 # メモ
 
-コンテンツ1個づつ指定しないといけないのかなぁ。
-mimeも拡張子見てやってくれるといいんだけど。
-
-コンテンツ部分のHCLを自動生成すればいいのかな。
-
-[Using Terraform for S3 Storage with MIME Type Association | State Farm Engineering](https://engineering.statefarm.com/blog/terraform-s3-upload-with-mime/) にしたがってfor_eachとmimeで生成するようにした。
+[Using Terraform for S3 Storage with MIME Type Association | State Farm Engineering](https://engineering.statefarm.com/blog/terraform-s3-upload-with-mime/) にしたがって
+ディレクトリまるごとfor_eachとmimeでs3にあげるようにした。
+`terraform state list` でどんな感じかわかると思う。
