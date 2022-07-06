@@ -7,6 +7,13 @@ variable "aws_region" {
 variable "author_mail" {
   default = "foo@example.com"
 }
+variable "hosted_domain" {
+  default = "example.com"
+}
+variable "custom_domain" {
+  default = "www.example.com"
+}
+
 locals {
   prefix = var.prefix # just as macro
 }
@@ -22,6 +29,17 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  default_tags {
+    tags = {
+      mail        = var.author_mail
+      provided_by = "Terraform"
+    }
+  }
+}
+
+provider "aws" {
+  alias  = "cloudfront-acm-certs"
+  region = "us-east-1"
   default_tags {
     tags = {
       mail        = var.author_mail
