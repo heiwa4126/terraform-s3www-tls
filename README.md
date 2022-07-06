@@ -1,7 +1,11 @@
-# terraform-s3www
+# terraform-s3www-tsl
 
-Terraformでs3バケットをwww公開するサンプル。
-s3にコンテンツも流し込む。
+「Terraformでs3バケットをwww公開するサンプル terraform-s3www」のフォークで
+aws_acm_certificate を使って https の独自ドメインで公開するサンプル。
+
+# 前提
+
+Route 53でホストゾーンを登録していること
 
 
 # deploy
