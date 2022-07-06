@@ -43,8 +43,8 @@ resource "aws_s3_object" "www" {
   source = "${path.root}/contents/${each.value}"
 
   etag = filemd5("${path.root}/contents/${each.value}")
-  # content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.value), null)
-  acl          = "public-read"
+  content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.value), null)
+  acl = "public-read"
 }
 
 output "s3wwwurl" {
