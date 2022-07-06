@@ -108,16 +108,21 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   viewer_certificate {
     # cloudfront_default_certificate = true
     cloudfront_default_certificate = false
-    acm_certificate_arn            = aws_acm_certificate.example.arn
+    acm_certificate_arn            = aws_acm_certificate.www.arn
     minimum_protocol_version       = "TLSv1.1_2016"
     ssl_support_method             = "sni-only"
   }
 }
 
 resource "aws_route53_record" "cname" {
-  zone_id = data.aws_route53_zone.example.zone_id
+  zone_id = data.aws_route53_zone.www.zone_id
   name    = var.custom_domain
   type    = "CNAME"
   ttl     = 600
   records = [aws_cloudfront_distribution.s3_distribution.domain_name]
+}
+
+output "s3wwwurl_tsl" {
+  description = "URL of S3 bucket to hold website content"
+  value       = "https://${var.custom_domain}/"
 }
