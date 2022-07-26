@@ -37,6 +37,7 @@ resource "aws_s3_bucket_public_access_block" "www" {
   restrict_public_buckets = true # S3から直にhttp:でアクセスできない
 }
 
+# TODO: CloudFrontだとこれ不要なのでは? 確認する
 resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
   # error_document {

@@ -5,7 +5,7 @@ locals {
 }
 
 resource "aws_cloudfront_origin_access_identity" "s3d" {
-  comment = "Some comment"
+  comment = "for ${var.custom_domain}"
 }
 
 # TODO: 今のところWAFとloggingなし
@@ -22,7 +22,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Some comment"
+  comment             = "for ${var.custom_domain}"
   default_root_object = "index.html"
 
   # logging_config {
