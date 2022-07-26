@@ -1,6 +1,7 @@
 locals {
   mime_types = {
     ".%" : "application/x-trash",
+    "..ico" : "image/vnd.microsoft.icon",
     ".123" : "application/vnd.lotus-1-2-3",
     ".1905.1" : "application/vnd.ieee.1905",
     ".1clr" : "application/clr",

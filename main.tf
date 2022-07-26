@@ -1,8 +1,8 @@
 variable "prefix" {
-  default = "s3www-"
+  default = "s3www-tsl-"
 }
 variable "aws_region" {
-  default = "ap-northeast-3"
+  default = "ap-northeast-1"
 }
 variable "author_mail" {
   default = "foo@example.com"
@@ -31,8 +31,9 @@ provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      mail        = var.author_mail
-      provided_by = "Terraform"
+      mail         = var.author_mail
+      project_name = "s3www-tsl"
+      provided_by  = "Terraform"
     }
   }
 }
