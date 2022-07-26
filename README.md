@@ -21,6 +21,13 @@ AWSアカウントは
 ```bash
 cp terraform.tfvars- terraform.tfvars
 vim terraform.tfvars  # お好みに合わせて修正
+cp main_override.tf- main_override.tf
+vim main_override.tf  # backend情報などをお好みに合わせて修正
+```
+
+で
+
+```bash
 terraform init
 terraform apply
 ```
