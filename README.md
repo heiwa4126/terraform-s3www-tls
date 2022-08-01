@@ -8,6 +8,26 @@ aws_acm_certificate を使って https の独自ドメインで公開するサ�
 Route 53でホストゾーンを登録していること。
 
 
+# メモ
+
+「certificateだけus-east-1」というAWSの仕様にもかかわらず
+1回でデプロイできるTerraformはえらい。
+
+CloudFrontのオリジンをS3にすると、
+サブディレクトリのインデックスが使えないことに注意。
+もちろんSPAみたいな場合は気にしなくていいのでケースバイケース。
+
+このサンプルではS3 static webをオリジンにし、
+S3バケットポリシーをCloudFrontでつけるRefererで識別する設定になっている。
+
+このへん参考
+- [CloudFront を使用して Amazon S3 でホストされた静的ウェブサイトを公開する](https://aws.amazon.com/jp/premiumsupport/knowledge-center/cloudfront-serve-static-website/)
+- [AWS CloudFront + S3による静的サイト配信時のインデックスドキュメントについて | 麦茶派エンジニア](https://crimsonality.net/aws/about-cloudfront-s3-index-document/)
+- [CloudFrontとS3で作成する静的サイト構成の私的まとめ | DevelopersIO](https://dev.classmethod.jp/articles/s3-cloudfront-static-site-design-patterns-2022/)
+
+S3オリジンの設定もコメントアウトして残してある。
+
+
 # deploy
 
 AWSアカウントは
@@ -38,19 +58,6 @@ terraform apply
 ```bash
 ./curl-test.sh
 ```
-またはoutputのs3wwwurl_tsl のURLにブラウザでアクセス
+で。
 
-
-# メモ
-
-「certificateだけus-east-1」というAWSの仕様にもかかわらず
-1回でデプロイできるTerraformはえらい。
-
-CloudFrontごしではサブディレクトリのデフォルトドキュメントが使えないことに注意。
-
-このへん参考
-- [AWS CloudFront + S3による静的サイト配信時のインデックスドキュメントについて | 麦茶派エンジニア](https://crimsonality.net/aws/about-cloudfront-s3-index-document/)
-- [CloudFrontとS3で作成する静的サイト構成の私的まとめ | DevelopersIO](https://dev.classmethod.jp/articles/s3-cloudfront-static-site-design-patterns-2022/)
-
-OAIでCloudFront限定にして、
-S3 WWWにアクセスすればまあいいわけだ。
+最初の2つは成功するテストで、あと2つは失敗するテスト。

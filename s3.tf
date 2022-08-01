@@ -23,18 +23,19 @@ resource "aws_s3_bucket_ownership_controls" "www" {
   }
 }
 
+# tfsec:ignore:aws-s3-no-public-buckets
 resource "aws_s3_bucket_public_access_block" "www" {
   depends_on              = [aws_s3_bucket_policy.www]
   bucket                  = aws_s3_bucket.www.id
   block_public_acls       = true
-  block_public_policy     = false  # TODO: あとでtrueにする
+  block_public_policy     = true # 作業中はfalseにしないときつい
   ignore_public_acls      = true
-  # restrict_public_buckets = true # S3から直にhttp:でアクセスできない
-  restrict_public_buckets = false
+  restrict_public_buckets = false # CloudFrontでS3をオリジンにする場合trueで
 }
 
 
-# CloudFrontでS3をオリジンにすると、サブディレクトリのインデックスドキュメントが使えない
+# CloudFrontでS3をオリジンにする場合不要
+# ただしサブディレクトリのインデックスドキュメントが使えない
 resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
   # error_document {
@@ -50,7 +51,8 @@ resource "aws_s3_bucket_policy" "www" {
   policy = data.aws_iam_policy_document.www.json
 }
 
-# S3をCloudFrontのoriginにする場合
+# # S3をCloudFrontのoriginにする場合のバケットポリシー
+# # ただしサブディレクトリのindex.htmlは効かない
 # data "aws_iam_policy_document" "www" {
 #   statement {
 #     sid       = "GetObjectFromCloudFront"
@@ -64,7 +66,6 @@ resource "aws_s3_bucket_policy" "www" {
 #   }
 # }
 
-
 data "aws_iam_policy_document" "www" {
   statement {
     sid       = "PublicReadGetObject"
@@ -75,10 +76,13 @@ data "aws_iam_policy_document" "www" {
       type        = "AWS"
       identifiers = ["*"]
     }
-    # TODO:あとでコンディションを追加する
+    condition {
+      test     = "StringLike"
+      variable = "aws:Referer"
+      values   = [random_id.cloudfront_referer.hex]
+    }
   }
 }
-
 
 resource "aws_s3_object" "www" {
   for_each = fileset("${path.root}/contents", "**/*")

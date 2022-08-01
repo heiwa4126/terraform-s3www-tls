@@ -1,16 +1,14 @@
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
 
-# locals {
-#   s3_origin_id = "myS3Origin"
-# }
-
 resource "aws_cloudfront_origin_access_identity" "s3d" {
-  comment = "for ${var.custom_domain}"
+  comment = "for ${var.custom_domain} to S3 bucket ${aws_s3_bucket.www.id}"
 }
 
 # TODO: 今のところWAFとloggingなし
 # tfsec:ignore:aws-cloudfront-enable-waf tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "s3_distribution" {
+  # S3をoriginにする場合こっちを使うこと
+  # ただしsubdirのindex.htmlつかえない
   # origin {
   #   domain_name = aws_s3_bucket.www.bucket_regional_domain_name
   #   origin_id   = aws_s3_bucket.www.id
@@ -19,21 +17,32 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   #   }
   # }
 
+  # S3 static webの時のorigin
   origin {
     domain_name = aws_s3_bucket_website_configuration.www.website_endpoint
-    origin_id   = aws_s3_bucket.www.id
+    origin_id   = aws_s3_bucket.www.id # ここはもう少し考えたほうがいいかも。s3originの時と変えるべきかも。
 
     custom_origin_config {
       http_port              = 80
-      https_port             = 443
       origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      https_port             = 443         # 無視される(はず)
+      origin_ssl_protocols   = ["TLSv1.2"] # 無視される(はず)
+    }
+
+    # S3をoriginにする場合不要
+    custom_header {
+      # https://aws.amazon.com/jp/premiumsupport/knowledge-center/cloudfront-serve-static-website/ の
+      # - 匿名 (パブリック) アクセスを許可して、ウェブサイトのエンドポイントをオリジンとして使用する
+      # - アクセスが Referer ヘッダーで制限されたオリジンとして、ウェブサイトのエンドポイントを使用する
+      # の節を参照
+      name  = "Referer"
+      value = random_id.cloudfront_referer.hex
     }
   }
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "for ${var.custom_domain}"
+  comment             = "for ${var.custom_domain} to S3 bucket ${aws_s3_bucket.www.id}"
   default_root_object = "index.html"
 
   # logging_config {

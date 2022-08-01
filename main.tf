@@ -17,6 +17,11 @@ variable "custom_domain" {
 locals {
   prefix = var.prefix # just as macro
 }
+
+resource "random_id" "cloudfront_referer" {
+  byte_length = 8
+}
+
 terraform {
   required_providers {
     aws = {
