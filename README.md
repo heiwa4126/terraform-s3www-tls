@@ -1,4 +1,4 @@
-# terraform-s3www-tsl
+# terraform-s3www-tls
 
 「Terraformでs3バケットをwww公開するサンプル terraform-s3www」のフォークで
 aws_acm_certificate を使って https の独自ドメインで公開するサンプル。
