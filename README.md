@@ -45,3 +45,12 @@ terraform apply
 
 「certificateだけus-east-1」というAWSの仕様にもかかわらず
 1回でデプロイできるTerraformはえらい。
+
+CloudFrontごしではサブディレクトリのデフォルトドキュメントが使えないことに注意。
+
+このへん参考
+- [AWS CloudFront + S3による静的サイト配信時のインデックスドキュメントについて | 麦茶派エンジニア](https://crimsonality.net/aws/about-cloudfront-s3-index-document/)
+- [CloudFrontとS3で作成する静的サイト構成の私的まとめ | DevelopersIO](https://dev.classmethod.jp/articles/s3-cloudfront-static-site-design-patterns-2022/)
+
+OAIでCloudFront限定にして、
+S3 WWWにアクセスすればまあいいわけだ。

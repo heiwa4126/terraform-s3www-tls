@@ -15,11 +15,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "www" {
   }
 }
 
-# resource "aws_s3_bucket_acl" "www" {
-#   bucket = aws_s3_bucket.www.id
-#   acl    = "private"
-# }
-
 # ACLを一切使わない。ポリシーのみで制御。最近の流行
 resource "aws_s3_bucket_ownership_controls" "www" {
   bucket = aws_s3_bucket.www.id
@@ -32,12 +27,14 @@ resource "aws_s3_bucket_public_access_block" "www" {
   depends_on              = [aws_s3_bucket_policy.www]
   bucket                  = aws_s3_bucket.www.id
   block_public_acls       = true
-  block_public_policy     = true
+  block_public_policy     = false  # TODO: あとでtrueにする
   ignore_public_acls      = true
-  restrict_public_buckets = true # S3から直にhttp:でアクセスできない
+  # restrict_public_buckets = true # S3から直にhttp:でアクセスできない
+  restrict_public_buckets = false
 }
 
-# TODO: CloudFrontだとこれ不要なのでは? 確認する
+
+# CloudFrontでS3をオリジンにすると、サブディレクトリのインデックスドキュメントが使えない
 resource "aws_s3_bucket_website_configuration" "www" {
   bucket = aws_s3_bucket.www.id
   # error_document {
@@ -53,18 +50,35 @@ resource "aws_s3_bucket_policy" "www" {
   policy = data.aws_iam_policy_document.www.json
 }
 
+# S3をCloudFrontのoriginにする場合
+# data "aws_iam_policy_document" "www" {
+#   statement {
+#     sid       = "GetObjectFromCloudFront"
+#     effect    = "Allow"
+#     actions   = ["s3:GetObject"]
+#     resources = ["${aws_s3_bucket.www.arn}/*"]
+#     principals {
+#       type        = "AWS"
+#       identifiers = [aws_cloudfront_origin_access_identity.s3d.iam_arn]
+#     }
+#   }
+# }
+
+
 data "aws_iam_policy_document" "www" {
   statement {
-    sid       = "GetObjectFromCloudFront"
+    sid       = "PublicReadGetObject"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.www.arn}/*"]
     principals {
       type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.s3d.iam_arn]
+      identifiers = ["*"]
     }
+    # TODO:あとでコンディションを追加する
   }
 }
+
 
 resource "aws_s3_object" "www" {
   for_each = fileset("${path.root}/contents", "**/*")
@@ -82,5 +96,9 @@ resource "aws_s3_object" "www" {
 output "s3wwwurl" {
   description = "URL of S3 bucket to hold website content"
   value       = "http://${aws_s3_bucket_website_configuration.www.website_endpoint}/"
-  # このURLでアクセス不可
+  # CloudForntでヘッダをつけて、最終的にはこのURLでアクセス不可にする
+}
+output "objecturl" {
+  value = "https://${aws_s3_bucket.www.bucket_regional_domain_name}/index.html"
+  # こちらも↑と同様
 }

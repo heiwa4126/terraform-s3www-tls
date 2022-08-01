@@ -1,8 +1,8 @@
 # see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
 
-locals {
-  s3_origin_id = "myS3Origin"
-}
+# locals {
+#   s3_origin_id = "myS3Origin"
+# }
 
 resource "aws_cloudfront_origin_access_identity" "s3d" {
   comment = "for ${var.custom_domain}"
@@ -11,12 +11,23 @@ resource "aws_cloudfront_origin_access_identity" "s3d" {
 # TODO: 今のところWAFとloggingなし
 # tfsec:ignore:aws-cloudfront-enable-waf tfsec:ignore:aws-cloudfront-enable-logging
 resource "aws_cloudfront_distribution" "s3_distribution" {
-  origin {
-    domain_name = aws_s3_bucket.www.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
+  # origin {
+  #   domain_name = aws_s3_bucket.www.bucket_regional_domain_name
+  #   origin_id   = aws_s3_bucket.www.id
+  #   s3_origin_config {
+  #     origin_access_identity = aws_cloudfront_origin_access_identity.s3d.cloudfront_access_identity_path
+  #   }
+  # }
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.s3d.cloudfront_access_identity_path
+  origin {
+    domain_name = aws_s3_bucket_website_configuration.www.website_endpoint
+    origin_id   = aws_s3_bucket.www.id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -36,7 +47,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.s3_origin_id
+    target_origin_id = aws_s3_bucket.www.id
 
     forwarded_values {
       query_string = false
